@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seeker Dashboard - JobPortal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar sidebar-light">
+            <a href="#" class="brand">
+                <div class="brand-icon">JP</div>
+                <span>JobPortal</span>
+            </a>
+            
+            <ul class="sidebar-nav">
+                <li><a href="#" class="active" onclick="switchSeekerTab('dashboard', event)"><i class="fas fa-home me-2"></i> Dashboard</a></li>
+                <li><a href="#" onclick="switchSeekerTab('find', event)"><i class="fas fa-briefcase me-2"></i> Find Jobs</a></li>
+                <li><a href="#" onclick="switchSeekerTab('saved', event)"><i class="fas fa-heart me-2"></i> Saved Jobs</a></li>
+                <li><a href="#" onclick="switchSeekerTab('applications', event)"><i class="fas fa-file-alt me-2"></i> My Applications</a></li>
+            </ul>
+
+            <div class="sidebar-bottom">
+                <ul class="sidebar-nav">
+                    <li><a href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                    <li><a href="#" onclick="logout()" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-search d-none d-md-block">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="jobSearchInput" placeholder="Search jobs, skills or companies..." oninput="searchJobs()">
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light rounded-circle p-2 position-relative">
+                        <i class="fas fa-bell text-muted"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                    </button>
+                    <div class="user-profile-badge">
+                        <div class="avatar" id="userAvatar">U</div>
+                        <span class="fw-semibold me-2" id="userGreeting">User</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Row -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-icon blue"><i class="fas fa-check-circle"></i></div>
+                    <div class="metric-info">
+                        <h5>Job Applied</h5>
+                        <h3 id="metric-applied">0</h3>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon orange"><i class="fas fa-bookmark"></i></div>
+                    <div class="metric-info">
+                        <h5>Saved Jobs</h5>
+                        <h3 id="metric-saved">0</h3>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon green"><i class="fas fa-envelope-open-text"></i></div>
+                    <div class="metric-info">
+                        <h5>Job Offers</h5>
+                        <h3 id="metric-offers">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upgrade Banner -->
+            <div class="upgrade-banner">
+                <div class="upgrade-text d-flex align-items-center gap-3">
+                    <div class="metric-icon" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-star"></i></div>
+                    <div>
+                        <h4>See jobs where you'd be a top applicant</h4>
+                        <p>Try PRO free for 6 months and boost your visibility.</p>
+                    </div>
+                </div>
+                <button class="btn btn-light fw-bold rounded-pill px-4 text-primary">GO PRO</button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-xl-8 col-lg-7">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0" id="mainJobGridTitle">Recommended For You</h4>
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="switchSeekerTab('find', null)">View All</button>
+                    </div>
+                    
+                    <!-- Jobs Grid -->
+                    <div id="jobsList" class="job-grid">
+                        <!-- Jobs will be populated here by JS -->
+                        <div class="col-12"><p class="text-muted">Loading jobs...</p></div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-5" id="profileAndAppsSection">
+                    <!-- Profile & Resume Section -->
+                    <div class="card-modern">
+                        <div class="card-header-modern">
+                            <h4 class="card-title-modern fw-bold">My Resume</h4>
+                        </div>
+                        
+                        <div class="upload-area" onclick="document.getElementById('resumeFile').click()">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <h5 class="fw-bold">Upload Resume</h5>
+                            <p class="text-muted small mb-0">Drag & drop or click to browse</p>
+                            <p class="text-muted small mb-0">PDF, DOCX up to 5MB</p>
+                        </div>
+                        
+                        <form id="resumeUploadForm" class="d-none">
+                            <input type="file" id="resumeFile" onchange="uploadResume()" accept=".pdf,.doc,.docx">
+                        </form>
+                    </div>
+
+                    <!-- Applications Section -->
+                    <div class="card-modern mt-4">
+                        <div class="card-header-modern">
+                            <h4 class="card-title-modern fw-bold">Recent Applications</h4>
+                        </div>
+                        <div id="applicationsList" class="d-flex flex-column gap-3">
+                            <!-- Applications will be populated here -->
+                            <p class="text-muted small">Loading applications...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initSeekerDashboard();
+        });
+    </script>
+</body>
+</html>
