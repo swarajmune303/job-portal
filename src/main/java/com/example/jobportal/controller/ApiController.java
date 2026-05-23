@@ -107,6 +107,24 @@ public class ApiController {
         return ResponseEntity.ok(userService.searchSeekers(query));
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User updated = userService.updateUser(id, user);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // --- Resume Endpoints ---
     @PostMapping("/users/{id}/resume")
     public ResponseEntity<?> uploadResume(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
@@ -129,6 +147,15 @@ public class ApiController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + user.getResumeFilename() + "\"")
                     .contentType(MediaType.parseMediaType(user.getResumeContentType()))
                     .body(user.getResumeData());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/jobs/{id}")
+    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+        boolean deleted = jobService.deleteJob(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
     }

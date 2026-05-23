@@ -26,11 +26,12 @@
                 <li><a href="#" onclick="switchCompanyTab('candidates', event)"><i class="fas fa-users me-2"></i> Candidates</a></li>
                 <li><a href="#" onclick="switchCompanyTab('jobs', event)"><i class="fas fa-briefcase me-2"></i> Jobs</a></li>
                 <li><a href="#" onclick="switchCompanyTab('schedule', event)"><i class="fas fa-calendar-alt me-2"></i> Schedule</a></li>
+                <li><a href="#" onclick="switchCompanyTab('profile', event)"><i class="fas fa-user me-2"></i> Profile</a></li>
             </ul>
 
             <div class="sidebar-bottom">
                 <ul class="sidebar-nav">
-                    <li><a href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                    <li><a href="#" onclick="switchCompanyTab('settings', event)"><i class="fas fa-cog me-2"></i> Settings</a></li>
                     <li><a href="#" onclick="logout()" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
             </div>
@@ -50,98 +51,190 @@
                     <button class="btn btn-primary-custom btn-modern me-3" data-bs-toggle="modal" data-bs-target="#postJobModal">
                         <i class="fas fa-plus"></i> Create Job
                     </button>
-                    <button class="btn btn-light rounded-circle p-2 position-relative">
-                        <i class="fas fa-bell text-muted"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                    </button>
-                    <div class="user-profile-badge">
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle p-2 position-relative" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
+                            <i class="fas fa-bell text-muted"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="notificationBadge" style="display: none;"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-0 border-0 shadow-lg" style="width: 320px; border-radius: var(--radius-md); overflow: hidden; margin-top: 10px; z-index: 1050;">
+                            <div class="p-3 bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold"><i class="fas fa-bell me-2"></i> Notifications</h6>
+                                <span class="badge bg-white text-primary rounded-pill small" id="notificationCount">0 New</span>
+                            </div>
+                            <div id="notificationList" class="d-flex flex-column" style="max-height: 300px; overflow-y: auto; background: white;">
+                                <div class="p-4 text-center text-muted small"><i class="fas fa-bell-slash d-block fs-3 mb-2 text-light"></i>No notifications yet</div>
+                            </div>
+                            <div class="p-2 border-top bg-light text-center">
+                                <a href="#" class="text-decoration-none small fw-semibold text-primary" onclick="markAllNotificationsRead(event)">Mark all as read</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile-badge" style="cursor: pointer;" onclick="switchCompanyTab('profile', event)">
                         <div class="avatar" id="userAvatar">C</div>
                         <span class="fw-semibold me-2" id="userGreeting">Company</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Metrics Row -->
-            <div class="metric-row" id="hrMetricsRow">
-                <div class="metric-card">
-                    <div class="metric-icon blue"><i class="fas fa-users"></i></div>
-                    <div class="metric-info">
-                        <h5>Total Candidates</h5>
-                        <h3 id="metric-total-candidates">0</h3>
-                        <p class="text-muted small m-0 mt-1">Across all jobs</p>
+            <!-- Dashboard View -->
+            <div id="companyDashboardView">
+                <!-- Metrics Row -->
+                <div class="metric-row" id="hrMetricsRow">
+                    <div class="metric-card">
+                        <div class="metric-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="metric-info">
+                            <h5>Total Candidates</h5>
+                            <h3 id="metric-total-candidates">0</h3>
+                            <p class="text-muted small m-0 mt-1">Across all jobs</p>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon purple" style="background: #F3E8FF; color: #6B21A8;"><i class="fas fa-user-plus"></i></div>
+                        <div class="metric-info">
+                            <h5>New Candidates</h5>
+                            <h3 id="metric-new-candidates">0</h3>
+                            <p class="text-muted small m-0 mt-1">Status: Applied</p>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon orange"><i class="fas fa-calendar-check"></i></div>
+                        <div class="metric-info">
+                            <h5>Upcoming Interview</h5>
+                            <h3 id="metric-interviews">0</h3>
+                            <p class="text-muted small m-0 mt-1">Status: Interview</p>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon green"><i class="fas fa-user-check"></i></div>
+                        <div class="metric-info">
+                            <h5>Candidate Hired</h5>
+                            <h3 id="metric-hired">0</h3>
+                            <p class="text-muted small m-0 mt-1">Status: Offer</p>
+                        </div>
                     </div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-icon purple" style="background: #F3E8FF; color: #6B21A8;"><i class="fas fa-user-plus"></i></div>
-                    <div class="metric-info">
-                        <h5>New Candidates</h5>
-                        <h3 id="metric-new-candidates">0</h3>
-                        <p class="text-muted small m-0 mt-1">Status: Applied</p>
+
+                <div class="row g-4" id="companyMainContentRow">
+                    <!-- Left Column: Jobs List -->
+                    <div class="col-xl-4 col-lg-5" id="companyJobsCol">
+                        <div class="card-modern">
+                            <div class="card-header-modern">
+                                <h4 class="card-title-modern fw-bold">Active Jobs</h4>
+                            </div>
+                            <div id="companyJobsList" class="d-flex flex-column gap-3">
+                                <!-- Jobs populated by JS -->
+                                <p class="text-muted small">Loading jobs...</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon orange"><i class="fas fa-calendar-check"></i></div>
-                    <div class="metric-info">
-                        <h5>Upcoming Interview</h5>
-                        <h3 id="metric-interviews">0</h3>
-                        <p class="text-muted small m-0 mt-1">Status: Interview</p>
-                    </div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon green"><i class="fas fa-user-check"></i></div>
-                    <div class="metric-info">
-                        <h5>Candidate Hired</h5>
-                        <h3 id="metric-hired">0</h3>
-                        <p class="text-muted small m-0 mt-1">Status: Offer</p>
+
+                    <!-- Right Column: ATS -->
+                    <div class="col-xl-8 col-lg-7" id="companyAtsCol">
+                        <div class="card-modern h-100">
+                            <div class="card-header-modern mb-2">
+                                <div>
+                                    <h4 class="card-title-modern fw-bold" id="atsTitle">Applicant Tracking System</h4>
+                                    <p class="text-muted small m-0 mt-1" id="atsDesc">Select a job to view applicants.</p>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive-custom">
+                                <table class="table table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th>Applicant Name</th>
+                                            <th>Match Score</th>
+                                            <th>Skills</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="atsTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="fas fa-inbox fs-1 mb-3 text-light"></i>
+                                                <p>Select a job from the left to view applicants</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4" id="companyMainContentRow">
-                <!-- Left Column: Jobs List -->
-                <div class="col-xl-4 col-lg-5" id="companyJobsCol">
-                    <div class="card-modern">
-                        <div class="card-header-modern">
-                            <h4 class="card-title-modern fw-bold">Active Jobs</h4>
-                        </div>
-                        <div id="companyJobsList" class="d-flex flex-column gap-3">
-                            <!-- Jobs populated by JS -->
-                            <p class="text-muted small">Loading jobs...</p>
+            <!-- Profile View -->
+            <div id="companyProfileView" style="display: none;">
+                <div class="card-modern mx-auto p-4" style="max-width: 600px;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="avatar bg-primary text-white fs-3 d-flex align-items-center justify-content-center" id="companyProfileAvatar" style="width: 60px; height: 60px; border-radius: 50%;">C</div>
+                        <div>
+                            <h4 class="fw-bold m-0" id="companyProfileNameHeader">Acme Corp</h4>
+                            <p class="text-muted m-0" id="companyProfileRoleHeader">Company Account</p>
                         </div>
                     </div>
+                    
+                    <form id="companyProfileForm">
+                        <div class="mb-3">
+                            <label for="companyProfileName" class="form-label fw-semibold">Company Name</label>
+                            <input type="text" class="form-control form-control-modern" id="companyProfileName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="companyProfileEmail" class="form-label fw-semibold">Contact Email</label>
+                            <input type="email" class="form-control form-control-modern" id="companyProfileEmail" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-modern btn-primary-custom w-100 py-3">Save Profile Changes</button>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Right Column: ATS -->
-                <div class="col-xl-8 col-lg-7" id="companyAtsCol">
-                    <div class="card-modern h-100">
-                        <div class="card-header-modern mb-2">
-                            <div>
-                                <h4 class="card-title-modern fw-bold" id="atsTitle">Applicant Tracking System</h4>
-                                <p class="text-muted small m-0 mt-1" id="atsDesc">Select a job to view applicants.</p>
-                            </div>
+            <!-- Settings View -->
+            <div id="companySettingsView" style="display: none;">
+                <div class="card-modern mx-auto p-4" style="max-width: 600px;">
+                    <h4 class="fw-bold mb-3"><i class="fas fa-cog me-2 text-primary"></i> Account Settings</h4>
+                    <p class="text-muted small mb-4">Manage your preferences, portal themes, and local session caches.</p>
+                    
+                    <!-- Theme Selector Section -->
+                    <div class="mb-4 pb-4 border-bottom">
+                        <h6 class="fw-bold mb-2">Portal Interface Theme</h6>
+                        <p class="text-muted small mb-3">Choose an interface style that matches your style.</p>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill active" id="theme-light-btn" onclick="setPortalTheme('light')">
+                                <i class="fas fa-sun me-1"></i> Vibrant Light
+                            </button>
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill" id="theme-dark-btn" onclick="setPortalTheme('dark')">
+                                <i class="fas fa-moon me-1"></i> Sleek Dark
+                            </button>
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill" id="theme-glass-btn" onclick="setPortalTheme('glass')">
+                                <i class="fas fa-eye me-1"></i> Glassmorphism
+                            </button>
                         </div>
+                    </div>
 
-                        <div class="table-responsive-custom">
-                            <table class="table table-modern">
-                                <thead>
-                                    <tr>
-                                        <th>Applicant Name</th>
-                                        <th>Match Score</th>
-                                        <th>Skills</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="atsTableBody">
-                                    <tr>
-                                        <td colspan="5" class="text-center py-5 text-muted">
-                                            <i class="fas fa-inbox fs-1 mb-3 text-light"></i>
-                                            <p>Select a job from the left to view applicants</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- Notification Toggles -->
+                    <div class="mb-4 pb-4 border-bottom">
+                        <h6 class="fw-bold mb-3">Mock Notifications Control</h6>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="mockEmailNotify" checked>
+                            <label class="form-check-label fw-medium text-dark" for="mockEmailNotify">Email Alerts on Candidate Apply</label>
+                            <div class="text-muted small">Send instant summaries to your contact email when candidates apply to active jobs.</div>
                         </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mockSystemNotify" checked>
+                            <label class="form-check-label fw-medium text-dark" for="mockSystemNotify">Real-time Push Badges</label>
+                            <div class="text-muted small">Show immediate updates and sound indicators on application changes.</div>
+                        </div>
+                    </div>
+
+                    <!-- Cache Purge -->
+                    <div>
+                        <h6 class="fw-bold text-danger mb-2">Data Management & Reset</h6>
+                        <p class="text-muted small mb-3">If the server has restarted or you want to wipe all local browser database mappings, click below.</p>
+                        <button class="btn btn-modern btn-outline-danger w-100 py-3" onclick="resetPortalCache()">
+                            <i class="fas fa-trash-alt me-1"></i> Purge & Reset Browser Cache
+                        </button>
                     </div>
                 </div>
             </div>
@@ -161,6 +254,10 @@
               <div class="mb-3">
                 <label for="jobTitle" class="form-label">Job Title</label>
                 <input type="text" class="form-control form-control-modern" id="jobTitle" placeholder="e.g. Senior Frontend Developer" required>
+              </div>
+              <div class="mb-3">
+                <label for="jobLocation" class="form-label">Location</label>
+                <input type="text" class="form-control form-control-modern" id="jobLocation" placeholder="e.g. New York, NY or Remote" required>
               </div>
               <div class="mb-3">
                 <label for="jobDesc" class="form-label">Job Description</label>

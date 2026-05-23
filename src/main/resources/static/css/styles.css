@@ -565,3 +565,118 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .upgrade-text h4 { color: white; margin: 0; font-size: 1.25rem; }
 .upgrade-text p { margin: 0; opacity: 0.9; font-size: 0.9rem; }
 
+/* --- HSL Dark Theme --- */
+body.theme-dark {
+    --bg-main: #0B0F19;
+    --bg-white: #111827;
+    --bg-card: #1F2937;
+    --text-dark: #F9FAFB;
+    --text-main: #E5E7EB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    --border-soft: #374151;
+    --border-medium: #4B5563;
+    --sidebar-light: #111827;
+    --sidebar-light-active: #1F2937;
+    --sidebar-light-text: #E5E7EB;
+}
+body.theme-dark .card-modern,
+body.theme-dark .topbar,
+body.theme-dark .modal-content,
+body.theme-dark .dropdown-menu {
+    background-color: #1F2937 !important;
+    border-color: #374151 !important;
+}
+body.theme-dark .form-control-modern,
+body.theme-dark .upload-area,
+body.theme-dark .bg-light {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+    color: #E5E7EB !important;
+}
+body.theme-dark .form-control-modern:focus {
+    background-color: #1F2937 !important;
+}
+body.theme-dark .text-dark {
+    color: #F9FAFB !important;
+}
+body.theme-dark .btn-light {
+    background-color: #374151 !important;
+    border-color: #4B5563 !important;
+    color: #E5E7EB !important;
+}
+
+/* --- Glassmorphism Theme --- */
+body.theme-glass {
+    --bg-main: linear-gradient(135deg, #EEF2F6 0%, #E0E7FF 100%);
+    --bg-white: rgba(255, 255, 255, 0.45);
+    --bg-card: rgba(255, 255, 255, 0.45);
+    --border-soft: rgba(255, 255, 255, 0.4);
+    --shadow-md: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+}
+body.theme-glass .card-modern,
+body.theme-glass .topbar,
+body.theme-glass .sidebar-light,
+body.theme-glass .sidebar-dark,
+body.theme-glass .modal-content {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06) !important;
+}
+body.theme-glass .sidebar-dark .brand span {
+    color: #1E1B4B !important;
+}
+body.theme-glass .sidebar-dark a {
+    color: #4B5563 !important;
+}
+body.theme-glass .sidebar-dark a.active {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #4F46E5 !important;
+}
+
+/* --- PRO Badges & Highlighting --- */
+.pro-badge {
+    background: linear-gradient(135deg, #F59E0B, #EC4899);
+    color: white !important;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+}
+.pro-badge i {
+    font-size: 0.65rem;
+}
+.top-applicant-card {
+    border: 2px solid #F59E0B !important;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12) !important;
+    animation: goldGlow 3s infinite alternate;
+}
+@keyframes goldGlow {
+    0% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1); }
+    100% { box-shadow: 0 4px 25px rgba(245, 158, 11, 0.25); }
+}
+.top-applicant-card::before {
+    content: '★ Top Applicant';
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: linear-gradient(135deg, #F59E0B, #EC4899);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    z-index: 10;
+}
+

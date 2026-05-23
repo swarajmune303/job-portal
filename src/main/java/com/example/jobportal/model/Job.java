@@ -12,9 +12,11 @@ public class Job {
 
     private String title;
     
+    private String location;
+    
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
     @Column(columnDefinition = "TEXT")
     private String requiredSkills; 
     
@@ -41,6 +43,14 @@ public class Job {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getDescription() {

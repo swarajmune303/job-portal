@@ -24,11 +24,12 @@
                 <li><a href="#" onclick="switchSeekerTab('find', event)"><i class="fas fa-briefcase me-2"></i> Find Jobs</a></li>
                 <li><a href="#" onclick="switchSeekerTab('saved', event)"><i class="fas fa-heart me-2"></i> Saved Jobs</a></li>
                 <li><a href="#" onclick="switchSeekerTab('applications', event)"><i class="fas fa-file-alt me-2"></i> My Applications</a></li>
+                <li><a href="#" onclick="switchSeekerTab('profile', event)"><i class="fas fa-user me-2"></i> Profile</a></li>
             </ul>
 
             <div class="sidebar-bottom">
                 <ul class="sidebar-nav">
-                    <li><a href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                    <li><a href="#" onclick="switchSeekerTab('settings', event)"><i class="fas fa-cog me-2"></i> Settings</a></li>
                     <li><a href="#" onclick="logout()" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
             </div>
@@ -44,100 +45,255 @@
                 </div>
                 
                 <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-light rounded-circle p-2 position-relative">
-                        <i class="fas fa-bell text-muted"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                    </button>
-                    <div class="user-profile-badge">
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle p-2 position-relative" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
+                            <i class="fas fa-bell text-muted"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="notificationBadge" style="display: none;"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-0 border-0 shadow-lg" style="width: 320px; border-radius: var(--radius-md); overflow: hidden; margin-top: 10px; z-index: 1050;">
+                            <div class="p-3 bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold"><i class="fas fa-bell me-2"></i> Notifications</h6>
+                                <span class="badge bg-white text-primary rounded-pill small" id="notificationCount">0 New</span>
+                            </div>
+                            <div id="notificationList" class="d-flex flex-column" style="max-height: 300px; overflow-y: auto; background: white;">
+                                <div class="p-4 text-center text-muted small"><i class="fas fa-bell-slash d-block fs-3 mb-2 text-light"></i>No notifications yet</div>
+                            </div>
+                            <div class="p-2 border-top bg-light text-center">
+                                <a href="#" class="text-decoration-none small fw-semibold text-primary" onclick="markAllNotificationsRead(event)">Mark all as read</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile-badge" style="cursor: pointer;" onclick="switchSeekerTab('profile', event)">
                         <div class="avatar" id="userAvatar">U</div>
                         <span class="fw-semibold me-2" id="userGreeting">User</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Metrics Row -->
-            <div class="metric-row">
-                <div class="metric-card">
-                    <div class="metric-icon blue"><i class="fas fa-check-circle"></i></div>
-                    <div class="metric-info">
-                        <h5>Job Applied</h5>
-                        <h3 id="metric-applied">0</h3>
+            <!-- Dashboard View (Metrics, Banner, and Main Row) -->
+            <div id="seekerDashboardView">
+                <!-- Metrics Row -->
+                <div class="metric-row">
+                    <div class="metric-card">
+                        <div class="metric-icon blue"><i class="fas fa-check-circle"></i></div>
+                        <div class="metric-info">
+                            <h5>Job Applied</h5>
+                            <h3 id="metric-applied">0</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon orange"><i class="fas fa-bookmark"></i></div>
+                        <div class="metric-info">
+                            <h5>Saved Jobs</h5>
+                            <h3 id="metric-saved">0</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon green"><i class="fas fa-envelope-open-text"></i></div>
+                        <div class="metric-info">
+                            <h5>Job Offers</h5>
+                            <h3 id="metric-offers">0</h3>
+                        </div>
                     </div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-icon orange"><i class="fas fa-bookmark"></i></div>
-                    <div class="metric-info">
-                        <h5>Saved Jobs</h5>
-                        <h3 id="metric-saved">0</h3>
+
+                <!-- Upgrade Banner -->
+                <div id="proBannerContainer">
+                    <div class="upgrade-banner">
+                        <div class="upgrade-text d-flex align-items-center gap-3">
+                            <div class="metric-icon" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-star"></i></div>
+                            <div>
+                                <h4>See jobs where you'd be a top applicant</h4>
+                                <p>Try PRO free for 6 months and boost your visibility.</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-light fw-bold rounded-pill px-4 text-primary" onclick="openProModal()">GO PRO</button>
                     </div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-icon green"><i class="fas fa-envelope-open-text"></i></div>
-                    <div class="metric-info">
-                        <h5>Job Offers</h5>
-                        <h3 id="metric-offers">0</h3>
+
+                <div class="row g-4">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-bold m-0" id="mainJobGridTitle">Recommended For You</h4>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="switchSeekerTab('find', null)">View All</button>
+                        </div>
+                        
+                        <!-- Jobs Grid -->
+                        <div id="jobsList" class="job-grid">
+                            <!-- Jobs will be populated here by JS -->
+                            <div class="col-12"><p class="text-muted">Loading jobs...</p></div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-5" id="profileAndAppsSection">
+                        <!-- Profile & Resume Section -->
+                        <div class="card-modern">
+                            <div class="card-header-modern">
+                                <h4 class="card-title-modern fw-bold">My Resume</h4>
+                            </div>
+                            
+                            <div id="resumeCardContent">
+                                <div class="upload-area" onclick="document.getElementById('resumeFile').click()">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <h5 class="fw-bold">Upload Resume</h5>
+                                    <p class="text-muted small mb-0">Drag & drop or click to browse</p>
+                                    <p class="text-muted small mb-0">PDF, DOCX up to 5MB</p>
+                                </div>
+                            </div>
+                            
+                            <form id="resumeUploadForm" class="d-none">
+                                <input type="file" id="resumeFile" onchange="uploadResume()" accept=".pdf,.doc,.docx">
+                            </form>
+                        </div>
+
+                        <!-- Applications Section -->
+                        <div class="card-modern mt-4">
+                            <div class="card-header-modern">
+                                <h4 class="card-title-modern fw-bold">Recent Applications</h4>
+                            </div>
+                            <div id="applicationsList" class="d-flex flex-column gap-3">
+                                <!-- Applications will be populated here -->
+                                <p class="text-muted small">Loading applications...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Upgrade Banner -->
-            <div class="upgrade-banner">
-                <div class="upgrade-text d-flex align-items-center gap-3">
-                    <div class="metric-icon" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-star"></i></div>
-                    <div>
-                        <h4>See jobs where you'd be a top applicant</h4>
-                        <p>Try PRO free for 6 months and boost your visibility.</p>
-                    </div>
-                </div>
-                <button class="btn btn-light fw-bold rounded-pill px-4 text-primary">GO PRO</button>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-xl-8 col-lg-7">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="fw-bold m-0" id="mainJobGridTitle">Recommended For You</h4>
-                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="switchSeekerTab('find', null)">View All</button>
+            <!-- Profile View -->
+            <div id="seekerProfileView" style="display: none;">
+                <div class="card-modern mx-auto p-4" style="max-width: 600px;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="avatar bg-primary text-white fs-3 d-flex align-items-center justify-content-center" id="profileAvatar" style="width: 60px; height: 60px; border-radius: 50%;">U</div>
+                        <div>
+                            <h4 class="fw-bold m-0" id="profileNameHeader">John Doe</h4>
+                            <p class="text-muted m-0" id="profileRoleHeader">Job Seeker</p>
+                        </div>
                     </div>
                     
-                    <!-- Jobs Grid -->
-                    <div id="jobsList" class="job-grid">
-                        <!-- Jobs will be populated here by JS -->
-                        <div class="col-12"><p class="text-muted">Loading jobs...</p></div>
-                    </div>
+                    <form id="seekerProfileForm">
+                        <div class="mb-3">
+                            <label for="profileName" class="form-label fw-semibold">Full Name</label>
+                            <input type="text" class="form-control form-control-modern" id="profileName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="profileEmail" class="form-label fw-semibold">Email Address</label>
+                            <input type="email" class="form-control form-control-modern" id="profileEmail" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="profileSkills" class="form-label fw-semibold">My Skills (comma separated)</label>
+                            <input type="text" class="form-control form-control-modern" id="profileSkills" placeholder="e.g., Java, Spring, React">
+                        </div>
+                        <button type="submit" class="btn btn-modern btn-primary-custom w-100 py-3">Save Profile Changes</button>
+                    </form>
                 </div>
-
-                <div class="col-xl-4 col-lg-5" id="profileAndAppsSection">
-                    <!-- Profile & Resume Section -->
-                    <div class="card-modern">
-                        <div class="card-header-modern">
-                            <h4 class="card-title-modern fw-bold">My Resume</h4>
+            <!-- Settings View -->
+            <div id="seekerSettingsView" style="display: none;">
+                <div class="card-modern mx-auto p-4" style="max-width: 600px;">
+                    <h4 class="fw-bold mb-3"><i class="fas fa-cog me-2 text-primary"></i> Account Settings</h4>
+                    <p class="text-muted small mb-4">Manage your preferences, portal themes, and local session caches.</p>
+                    
+                    <!-- Theme Selector Section -->
+                    <div class="mb-4 pb-4 border-bottom">
+                        <h6 class="fw-bold mb-2">Portal Interface Theme</h6>
+                        <p class="text-muted small mb-3">Choose an interface style that matches your style.</p>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill active" id="theme-light-btn" onclick="setPortalTheme('light')">
+                                <i class="fas fa-sun me-1"></i> Vibrant Light
+                            </button>
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill" id="theme-dark-btn" onclick="setPortalTheme('dark')">
+                                <i class="fas fa-moon me-1"></i> Sleek Dark
+                            </button>
+                            <button class="btn btn-modern btn-outline-primary-custom flex-fill" id="theme-glass-btn" onclick="setPortalTheme('glass')">
+                                <i class="fas fa-eye me-1"></i> Glassmorphism
+                            </button>
                         </div>
-                        
-                        <div class="upload-area" onclick="document.getElementById('resumeFile').click()">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <h5 class="fw-bold">Upload Resume</h5>
-                            <p class="text-muted small mb-0">Drag & drop or click to browse</p>
-                            <p class="text-muted small mb-0">PDF, DOCX up to 5MB</p>
-                        </div>
-                        
-                        <form id="resumeUploadForm" class="d-none">
-                            <input type="file" id="resumeFile" onchange="uploadResume()" accept=".pdf,.doc,.docx">
-                        </form>
                     </div>
 
-                    <!-- Applications Section -->
-                    <div class="card-modern mt-4">
-                        <div class="card-header-modern">
-                            <h4 class="card-title-modern fw-bold">Recent Applications</h4>
+                    <!-- Notification Toggles -->
+                    <div class="mb-4 pb-4 border-bottom">
+                        <h6 class="fw-bold mb-3">Mock Notifications Control</h6>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="mockEmailNotify" checked>
+                            <label class="form-check-label fw-medium text-dark" for="mockEmailNotify">Email Alerts on Job Match</label>
+                            <div class="text-muted small">Send instant summaries to your registered email when skills match perfectly.</div>
                         </div>
-                        <div id="applicationsList" class="d-flex flex-column gap-3">
-                            <!-- Applications will be populated here -->
-                            <p class="text-muted small">Loading applications...</p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mockSystemNotify" checked>
+                            <label class="form-check-label fw-medium text-dark" for="mockSystemNotify">Real-time Push Badges</label>
+                            <div class="text-muted small">Show immediate updates and sound indicators on application changes.</div>
                         </div>
+                    </div>
+
+                    <!-- Cache Purge -->
+                    <div>
+                        <h6 class="fw-bold text-danger mb-2">Data Management & Reset</h6>
+                        <p class="text-muted small mb-3">If the server has restarted or you want to wipe all local browser database mappings, click below.</p>
+                        <button class="btn btn-modern btn-outline-danger w-100 py-3" onclick="resetPortalCache()">
+                            <i class="fas fa-trash-alt me-1"></i> Purge & Reset Browser Cache
+                        </button>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- PRO Upgrade Modal -->
+    <div class="modal fade" id="proUpgradeModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="modal-header border-0 p-4 pb-0 text-white" style="background: linear-gradient(135deg, #4F46E5, #EC4899); position: relative; height: 160px; display: flex; align-items: flex-end; padding-bottom: 20px !important;">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark fw-bold mb-1" style="font-size: 0.7rem;">RECOMMENDED</span>
+                <h3 class="modal-title fw-bold text-white mb-0">JobPortal <span class="fw-bold" style="color: #F59E0B;">PRO</span></h3>
+                <p class="text-white-50 small mb-0">Boost your hiring opportunities immediately.</p>
+            </div>
+          </div>
+          <div class="modal-body p-4">
+            <div class="d-flex flex-column gap-3 mb-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Top Applicant Highlighting</h6>
+                        <p class="text-muted small mb-0">Get exclusive golden borders and a star badge next to your applications inside recruiter feeds.</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                    <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Match Filter Controls</h6>
+                        <p class="text-muted small mb-0">Activate top matching toggles to instantly filter jobs with 70%+ match scores.</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                    <div class="bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Priority Candidate Matching</h6>
+                        <p class="text-muted small mb-0">Elevate your visibility score and be matched before standard applications are reviewed.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-light p-3 rounded-3 mb-4 text-center">
+                <div class="fw-bold text-dark mb-1">JobPortal PRO Membership</div>
+                <div class="text-muted small">6 Months Free Access &bull; Cancel anytime</div>
+                <div class="fs-4 fw-bold text-primary mt-2">$0.00 <span class="fs-6 text-muted fw-normal">/ month</span></div>
+            </div>
+
+            <button class="btn btn-modern btn-primary-custom w-100 py-3 fw-bold" onclick="confirmProUpgrade()" style="background: linear-gradient(135deg, #4F46E5, #EC4899); border: none;">
+                Unlock Free PRO Access
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Scripts -->

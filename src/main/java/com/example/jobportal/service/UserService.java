@@ -34,6 +34,22 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
     
+    public User updateUser(Long id, User details) {
+        User user = getUserById(id);
+        if (user != null) {
+            user.setName(details.getName());
+            user.setEmail(details.getEmail());
+            if (details.getPassword() != null && !details.getPassword().trim().isEmpty()) {
+                user.setPassword(details.getPassword());
+            }
+            if ("SEEKER".equals(user.getRole())) {
+                user.setSkills(details.getSkills());
+            }
+            return userRepository.save(user);
+        }
+        return null;
+    }
+    
     public java.util.List<User> searchSeekers(String query) {
         if (query == null || query.trim().isEmpty()) {
             return java.util.Collections.emptyList();
